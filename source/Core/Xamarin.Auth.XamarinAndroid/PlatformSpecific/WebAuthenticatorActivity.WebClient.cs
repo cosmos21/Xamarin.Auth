@@ -94,9 +94,15 @@ namespace Xamarin.Auth._MobileServices
             public override void OnPageStarted(WebView view, string url, global::Android.Graphics.Bitmap favicon)
             {
                 view.Settings.UserAgentString = WebViewConfiguration.Android.UserAgent;
-
                 var uri = new Uri(url);
-                activity.state.Authenticator.OnPageLoading(uri);
+
+                string injectJs = activity.state.Authenticator.InjectedJavascriptForPage(uri);
+                if (injectJs != null)
+                {
+                    view.LoadUrl(injectJs);
+                }
+
+                //activity.state.Authenticator.OnPageLoading(uri);
                 activity.BeginProgress(uri.Authority);
 
                 return;

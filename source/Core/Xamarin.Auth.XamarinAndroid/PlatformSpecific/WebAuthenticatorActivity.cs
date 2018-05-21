@@ -22,8 +22,9 @@ using Android.OS;
 using System.Threading.Tasks;
 using Xamarin.Utilities.Android;
 using System.Text;
+using Java.Interop;
 
-#if ! AZURE_MOBILE_SERVICES
+#if !AZURE_MOBILE_SERVICES
 namespace Xamarin.Auth
 #else
 namespace Xamarin.Auth._MobileServices
@@ -49,6 +50,46 @@ namespace Xamarin.Auth._MobileServices
         internal static readonly ActivityStateRepository<State> StateRepo = new ActivityStateRepository<State>();
 
         State state;
+
+        class JavascriptInterceptor : Java.Lang.Object
+        {
+            private WebAuthenticatorActivity _activity;
+
+            public JavascriptInterceptor(WebAuthenticatorActivity activity)
+            {
+                _activity = activity;
+            }
+
+            [Export]
+            [JavascriptInterface]
+            public void OnReceivedSamlResponse(string base64SamlResponse)
+            {
+                Console.WriteLine("SAMLResponse={0}", base64SamlResponse);
+                _activity.OnSamlResponseReceived2(base64SamlResponse);
+            }
+        }
+
+        public void OnSamlResponseReceived2(string samlResponse)
+        {
+            this.RunOnUiThread(delegate {
+                Dictionary<string, string> formParams = new Dictionary<string, string>();
+                formParams.Add("SAMLResponse", samlResponse);
+                string url = webView.Url;
+                Uri uri = new Uri(webView.Url);
+                if (uri.Query == null)
+                {
+                    url+= "?SAMLResponse=" + samlResponse;
+                }
+                else
+                {
+                    url += "&SAMLResponse=" + samlResponse;
+                }
+                //this.state.Authenticator.PostedFormParameters = formParams;
+                this.state.Authenticator.OnPageLoading(new Uri(url));
+                this.EndProgress();
+                this.webView.StopLoading();
+            });
+        }
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -131,9 +172,12 @@ namespace Xamarin.Auth._MobileServices
                 Id = 42,
 
             };
+            JavascriptInterceptor jsInterceptor = new JavascriptInterceptor(this);
+            webView.AddJavascriptInterface(jsInterceptor, "jsInterceptor");
+
             webView.Settings.UserAgentString = WebViewConfiguration.Android.UserAgent;
             Client web_view_client = new Client(this);  // UserAgent set in the class
-                
+
             webView.Settings.JavaScriptEnabled = true;
             webView.SetWebViewClient(web_view_client);
             SetContentView(webView);

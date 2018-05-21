@@ -173,6 +173,11 @@ namespace Xamarin.Auth._MobileServices
 
         }
 
+        public virtual string InjectedJavascriptForPage(Uri url)
+        {
+            return null;
+        }
+
         public bool IsUriEncodedDataString(string s)
         {
         	if
