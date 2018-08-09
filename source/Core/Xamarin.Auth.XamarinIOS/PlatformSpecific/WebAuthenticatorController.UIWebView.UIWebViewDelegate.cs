@@ -24,6 +24,7 @@ using MonoTouch.UIKit;
 using Foundation;
 using UIKit;
 using WebKit;
+using System.Linq;
 #endif
 
 #if ! AZURE_MOBILE_SERVICES
@@ -128,7 +129,30 @@ namespace Xamarin.Auth._MobileServices
                         {
                             is_loadable_url = true;
                         }
+                        // COSMOS
 
+                        if (request.Body != null)
+                        {
+                            Encoding encoding = Encoding.UTF8;
+
+                            if (request.Headers != null && request.Headers.ContainsKey(new NSString("Content-Type")))
+                            {
+                                encoding = WebEx.GetEncodingFromContentType(request.Headers[new NSString("Content-Type")].ToString());
+                            }
+                            byte[] dataBytes = new byte[request.Body.Length];
+                            System.Runtime.InteropServices.Marshal.Copy(request.Body.Bytes, dataBytes, 0, Convert.ToInt32(request.Body.Length));
+                            string bodyString = encoding.GetString(dataBytes);
+                            System.Collections.Generic.IDictionary<string, string> formParams = WebEx.FormDecode(bodyString);
+                            var concatenatedParameters = formParams.Select(pair =>
+                                $"{System.Net.WebUtility.UrlEncode(pair.Key)}={System.Net.WebUtility.UrlEncode(pair.Value)}");
+                            
+                            var query = string.Join("&", concatenatedParameters);
+                            var uriString = string.IsNullOrEmpty(url.Query) ?
+                                url.OriginalString + $"?{query}" :
+                                url.OriginalString + $"&{query}";
+                            url = new Uri(uriString);
+                        }
+                        //
                         controller.authenticator.OnPageLoading(url);
                     }
                 }
