@@ -100,7 +100,7 @@ namespace Xamarin.Auth._MobileServices
                 );
             }
 
-            activity = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.White);
+            activity = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
             NavigationItem.RightBarButtonItem = new UIBarButtonItem(activity);
 
             if (WebViewConfiguration.IOS.IsUsingWKWebView == false)
