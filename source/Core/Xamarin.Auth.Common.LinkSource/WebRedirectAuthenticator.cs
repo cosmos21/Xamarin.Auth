@@ -180,8 +180,20 @@ namespace Xamarin.Auth._MobileServices
             //
             if (UrlMatchesRedirect(url))
             {
+                System.Diagnostics.Debug.WriteLine(String.Format("URL matches redirect {0}", url));
+
                 // TODO:  mc++ schemas
                 OnRedirectPageLoaded(url, query, fragment);
+            }
+            else
+            {
+#if DEBUG
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                sb.AppendLine("WebRedirectAuthenticator OnPageEncountered");
+                sb.AppendLine("     Url  = ").AppendLine(url.ToString());
+                sb.AppendLine("     RedirectUrl = ").AppendLine(redirectUrl.ToString());
+                System.Diagnostics.Debug.WriteLine(sb.ToString());
+#endif
             }
 
             return;

@@ -64,7 +64,7 @@ namespace Xamarin.Auth._MobileServices
             [JavascriptInterface]
             public void OnReceivedSamlResponse(string base64SamlResponse)
             {
-                Console.WriteLine("SAMLResponse={0}", base64SamlResponse);
+                Console.WriteLine("JavascriptInterface OnReceivedSamlResponse, SAMLResponse={0}", base64SamlResponse);
                 _activity.OnSamlResponseReceived2(base64SamlResponse);
             }
         }
@@ -72,20 +72,33 @@ namespace Xamarin.Auth._MobileServices
         public void OnSamlResponseReceived2(string samlResponse)
         {
             this.RunOnUiThread(delegate {
-                Dictionary<string, string> formParams = new Dictionary<string, string>();
-                formParams.Add("SAMLResponse", samlResponse);
-                string url = webView.Url;
-                Uri uri = new Uri(webView.Url);
-                if (uri.Query == null)
+                //Dictionary<string, string> formParams = new Dictionary<string, string>();
+                //formParams.Add("SAMLResponse", samlResponse);
+
+                string url = webView.Url;                
+                // Somehow by the time this code is run, webView.Url isn't still (or isn't yet) the redirect url
+                // we're looking for, so if we pass that to OnPageLoading the WebRedirectAuthenticator is going to
+                // ignore it and not end the authentication process.
+
+                // So we just force the url to be the one it's looking for, because if we've found SAMLResponse
+                // then we must be at the stage we need.
+                
+                // Hacky way of getting the redirecturl we're looking for into this activity class, 
+                // because it knows nothing about WebRedirectAuthenticator
+                url = this.Intent.GetStringExtra("RedirectUrl");
+
+                //Uri uri = new Uri(webView.Url);
+                //if (uri.Query == null)
                 {
                     url+= "?SAMLResponse=" + samlResponse;
                 }
-                else
-                {
-                    url += "&SAMLResponse=" + samlResponse;
-                }
+                //else
+                //{
+                //    url += "&SAMLResponse=" + samlResponse;
+                //}
                 //this.state.Authenticator.PostedFormParameters = formParams;
                 this.state.Authenticator.OnPageLoading(new Uri(url));
+
                 this.EndProgress();
                 this.webView.StopLoading();
             });
