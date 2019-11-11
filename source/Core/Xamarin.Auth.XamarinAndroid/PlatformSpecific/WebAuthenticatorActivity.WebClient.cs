@@ -96,11 +96,11 @@ namespace Xamarin.Auth._MobileServices
                 view.Settings.UserAgentString = WebViewConfiguration.Android.UserAgent;
                 var uri = new Uri(url);
 
-                string injectJs = activity.state.Authenticator.InjectedJavascriptForPage(uri);
-                if (injectJs != null)
-                {
-                    view.LoadUrl(injectJs);
-                }
+                //string injectJs = activity.state.Authenticator.InjectedJavascriptForPage(uri);
+                //if (injectJs != null)
+                //{
+                //    view.LoadUrl(injectJs);
+                //}
 
                 //activity.state.Authenticator.OnPageLoading(uri);
                 activity.BeginProgress(uri.Authority);
@@ -113,6 +113,13 @@ namespace Xamarin.Auth._MobileServices
                 view.Settings.UserAgentString = WebViewConfiguration.Android.UserAgent;
 
                 var uri = new Uri(url);
+
+                string injectJs = activity.state.Authenticator.InjectedJavascriptForPage(uri);
+                if (injectJs != null)
+                {
+                    view.LoadUrl(injectJs);
+                }
+
                 activity.state.Authenticator.OnPageLoaded(uri);
                 activity.EndProgress();
 

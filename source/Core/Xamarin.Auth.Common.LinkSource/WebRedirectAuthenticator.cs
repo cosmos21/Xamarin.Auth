@@ -187,13 +187,13 @@ namespace Xamarin.Auth._MobileServices
             }
             else
             {
-#if DEBUG
+//#if DEBUG
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 sb.AppendLine("WebRedirectAuthenticator OnPageEncountered");
                 sb.AppendLine("     Url  = ").AppendLine(url.ToString());
                 sb.AppendLine("     RedirectUrl = ").AppendLine(redirectUrl.ToString());
-                System.Diagnostics.Debug.WriteLine(sb.ToString());
-#endif
+                Console.WriteLine(sb.ToString());
+//#endif
             }
 
             return;
