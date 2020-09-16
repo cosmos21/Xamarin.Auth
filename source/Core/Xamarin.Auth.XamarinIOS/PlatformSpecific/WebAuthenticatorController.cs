@@ -47,7 +47,8 @@ namespace Xamarin.Auth._MobileServices
     {
         protected WebAuthenticator authenticator;
 
-        UIWebView ui_web_view;
+        // COSMOS
+        //UIWebView ui_web_view;
         WKWebView wk_web_view;
         UIView web_view = null;
 
@@ -103,21 +104,22 @@ namespace Xamarin.Auth._MobileServices
             activity = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.Gray);
             NavigationItem.RightBarButtonItem = new UIBarButtonItem(activity);
 
-            if (WebViewConfiguration.IOS.IsUsingWKWebView == false)
-            {
-                // UIWebView
+            //COSMOS
+            //if (WebViewConfiguration.IOS.IsUsingWKWebView == false)
+            //{
+            //    // UIWebView
 
-                #if DEBUG
-                StringBuilder sb1 = new StringBuilder();
-                sb1.Append("Embedded WebView using - UIWebView");
-                System.Diagnostics.Debug.WriteLine(sb1.ToString());
-                #endif
+            //    #if DEBUG
+            //    StringBuilder sb1 = new StringBuilder();
+            //    sb1.Append("Embedded WebView using - UIWebView");
+            //    System.Diagnostics.Debug.WriteLine(sb1.ToString());
+            //    #endif
 
-                web_view = PrepareUIWebView();
+            //    web_view = PrepareUIWebView();
 
-                this.View.AddSubview((UIWebView)web_view);
-             }
-            else
+            //    this.View.AddSubview((UIWebView)web_view);
+            // }
+            //else
             {
                 // WKWebView - availabilty and fallback is done in PrepareWKWebView()
 
@@ -158,18 +160,19 @@ namespace Xamarin.Auth._MobileServices
 			return;
         }
 
-        protected UIView PrepareUIWebView()
-        {
-            ui_web_view = new UIWebView(View.Bounds)
-            {
-                Delegate = new UIWebViewDelegate(this),
-                AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight,
-            };
-            web_view = ui_web_view;
-            View.AddSubview((UIWebView)web_view);
+        //COSMOS
+        //protected UIView PrepareUIWebView()
+        //{
+        //    ui_web_view = new UIWebView(View.Bounds)
+        //    {
+        //        Delegate = new UIWebViewDelegate(this),
+        //        AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight,
+        //    };
+        //    web_view = ui_web_view;
+        //    View.AddSubview((UIWebView)web_view);
 
-            return web_view;
-        }
+        //    return web_view;
+        //}
 
         protected UIView PrepareWKWebView()
         {
@@ -200,26 +203,28 @@ namespace Xamarin.Auth._MobileServices
                     AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight,
                 };
 
-                if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
-                {
-                    //  cheating!
-                    //  http://www.useragentstring.com/pages/useragentstring.php?typ=Browser
-                    wk_web_view.CustomUserAgent = WebViewConfiguration.IOS.UserAgent;
-                }
+                // COSMOS
+                //if (UIDevice.CurrentDevice.CheckSystemVersion(9, 0))
+                //{
+                //    //  cheating!
+                //    //  http://www.useragentstring.com/pages/useragentstring.php?typ=Browser
+                //    wk_web_view.CustomUserAgent = WebViewConfiguration.IOS.UserAgent;
+                //}
 
                 web_view = wk_web_view;
             }
-            else
-            {
-                // Fallback to Embedded WebView
-                StringBuilder msg = new StringBuilder();
-                msg.AppendLine("WKWebView not available!");
-                msg.AppendLine("Fallback to UIWebView");
+            // COSMOS
+    //        else
+    //        {
+    //            // Fallback to Embedded WebView
+    //            StringBuilder msg = new StringBuilder();
+    //            msg.AppendLine("WKWebView not available!");
+    //            msg.AppendLine("Fallback to UIWebView");
 
-				this.ShowErrorForNativeUIAlert(msg.ToString());
+				//this.ShowErrorForNativeUIAlert(msg.ToString());
 
-                web_view = PrepareUIWebView();
-            }
+    //            web_view = PrepareUIWebView();
+    //        }
 
 
             return web_view;
@@ -275,11 +280,12 @@ namespace Xamarin.Auth._MobileServices
             {
                 var request = new NSUrlRequest(new NSUrl(url.AbsoluteUri));
                 NSUrlCache.SharedCache.RemoveCachedResponse(request); // Always try
-                if (WebViewConfiguration.IOS.IsUsingWKWebView == false)
-                {
-                    ui_web_view.LoadRequest(request);
-                }
-                else
+                // COSMOS
+                //if (WebViewConfiguration.IOS.IsUsingWKWebView == false)
+                //{
+                //    ui_web_view.LoadRequest(request);
+                //}
+                //else
                 {
                     wk_web_view.LoadRequest(request);
 				}
