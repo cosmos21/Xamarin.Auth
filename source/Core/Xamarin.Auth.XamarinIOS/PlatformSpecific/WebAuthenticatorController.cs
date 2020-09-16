@@ -189,6 +189,10 @@ namespace Xamarin.Auth._MobileServices
                     wk_web_view_configuration.WebsiteDataStore = WKWebsiteDataStore.NonPersistentDataStore;
                 }
 
+                // COSMOS
+                wk_web_view_configuration.UserContentController = GetUserContentController();
+                // ------
+
                 wk_web_view = new WebKit.WKWebView(View.Frame, wk_web_view_configuration)
                 {
                     UIDelegate = new WKWebViewUIDelegate(this),

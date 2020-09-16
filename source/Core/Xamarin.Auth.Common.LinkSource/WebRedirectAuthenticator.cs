@@ -302,5 +302,12 @@ namespace Xamarin.Auth._MobileServices
 
             return sb.ToString();
         }
+
+        // COSMOS
+        public Uri GetRedirectUrl()
+        {
+            return this.redirectUrl;
+        }
+        // -----
     }
 }
