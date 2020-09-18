@@ -57,6 +57,9 @@ namespace Xamarin.Auth._MobileServices
         ProgressLabel progress;
         bool webViewVisible = true;
 
+        // COSMOS
+        IDisposable wk_loading_observer;
+
         const double TransitionTime = 0.25;
 
         bool keepTryingAfterError = true;
@@ -201,6 +204,9 @@ namespace Xamarin.Auth._MobileServices
                     UIDelegate = new WKWebViewUIDelegate(this),
                     NavigationDelegate = new WKWebViewNavigationDelegate(this),
                     AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight,
+
+                    // COSMOS
+                    AllowsBackForwardNavigationGestures = true
                 };
 
                 // COSMOS
@@ -368,9 +374,36 @@ namespace Xamarin.Auth._MobileServices
             {
                 Cancel();
             }
+
+            // COSMOS
+            // note, key is "loading" rather than "isLoading" which the property is exported as
+            wk_loading_observer = wk_web_view.AddObserver("loading", NSKeyValueObservingOptions.New, (observedchange) =>
+            {
+                System.Diagnostics.Debug.WriteLine($"loading: {wk_web_view.IsLoading}");
+                if (wk_web_view.IsLoading)
+                {
+                    this.activity.StartAnimating();
+                }
+                else
+                {
+                    this.activity.StopAnimating();
+                }
+            });
         }
         ///---------------------------------------------------------------------------------------
         #endregion
+
+        // COSMOS
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+
+            if (wk_loading_observer != null)
+            {
+                wk_loading_observer.Dispose();
+                wk_loading_observer = null;
+            }
+        }
 
         void WebView_LoadFinished(object sender, EventArgs e)
 		{

@@ -76,6 +76,12 @@ namespace Xamarin.Auth._MobileServices
                 System.Diagnostics.Debug.WriteLine(sb.ToString());
                 #endif
 
+                // COSMOS
+
+                var alertController = UIAlertController.Create(null, message, UIAlertControllerStyle.Alert);
+                alertController.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, (obj) => { completionHandler(); }));
+
+                controller.PresentViewController(alertController, animated: true, null);
                 return;
             }
         }
@@ -102,6 +108,8 @@ namespace Xamarin.Auth._MobileServices
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"WKWebViewNavigationDelegate.DecidePolicy ");
                 sb.AppendLine($"        webView.Url.AbsoluteString = {webView.Url.AbsoluteString}");
+                sb.AppendLine($"        navigationAction?.Request?.Url = {navigationAction?.Request?.Url}");
+                sb.AppendLine($"        navigationAction?.NavigationType = {navigationAction?.NavigationType}");
                 System.Diagnostics.Debug.WriteLine(sb.ToString());
                 #endif
 
@@ -135,15 +143,17 @@ namespace Xamarin.Auth._MobileServices
                 {
                     throw new NotImplementedException("code - Explicit/Server");
                 }
+
+                if (navigationAction.NavigationType == WKNavigationType.LinkActivated)
+                {
+                    UIApplication.SharedApplication.OpenUrl(navigationAction.Request.Url);
+                    decisionHandler(WKNavigationActionPolicy.Cancel);
+                    return;
+                }
+
                 // Navigation Allowed?
                 // page will not load without this one!
                 decisionHandler(WKNavigationActionPolicy.Allow);
-
-                //decisonHandler(WKNavigationActionPolicy.Cancel);    
-                //decisonHandler(WKNavigationActionPolicy.Allow);
-
-
-                return;
             }
 
             public override void DidFailNavigation
@@ -220,6 +230,9 @@ namespace Xamarin.Auth._MobileServices
                 sb.AppendLine($"        webView.Url.AbsoluteString = {webView.Url.AbsoluteString}");
                 System.Diagnostics.Debug.WriteLine(sb.ToString());
                 #endif
+
+                // COSMOS
+                controller.activity.StartAnimating();
 
                 return;
             }
